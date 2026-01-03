@@ -13,6 +13,9 @@ import { CommentsModuleConfig } from './pages/modules/CommentsModuleConfig';
 import { UsersModuleConfig } from './pages/modules/UsersModuleConfig';
 import { CustomersModuleConfig } from './pages/modules/CustomersModuleConfig';
 import { RolesModuleConfig } from './pages/modules/RolesModuleConfig';
+import { SettingsModuleConfig } from './pages/modules/SettingsModuleConfig';
+import { MenusModuleConfig } from './pages/modules/MenusModuleConfig';
+import { HomepageModuleConfig } from './pages/modules/HomepageModuleConfig';
 import { AnalyticsIntegrations } from './pages/Integrations';
 import { SEOConfig } from './pages/Config';
 
@@ -39,6 +42,10 @@ const App: React.FC = () => {
           <Route path="modules/users" element={<UsersModuleConfig />} />
           <Route path="modules/customers" element={<CustomersModuleConfig />} />
           <Route path="modules/roles" element={<RolesModuleConfig />} />
+          {/* System Modules */}
+          <Route path="modules/settings" element={<SettingsModuleConfig />} />
+          <Route path="modules/menus" element={<MenusModuleConfig />} />
+          <Route path="modules/homepage" element={<HomepageModuleConfig />} />
 
           {/* System Config */}
           <Route path="integrations" element={<AnalyticsIntegrations />} />

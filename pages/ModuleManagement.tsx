@@ -162,6 +162,10 @@ const moduleConfigRoutes: Record<string, string> = {
   'MOD-CUSTOMERS': '/modules/customers',
   'MOD-USERS': '/modules/users',
   'MOD-ROLES': '/modules/roles',
+  // System
+  'MOD-SETTINGS': '/modules/settings',
+  'MOD-MENUS': '/modules/menus',
+  'MOD-HOMEPAGE': '/modules/homepage',
 };
 
 // Component: Module Card
