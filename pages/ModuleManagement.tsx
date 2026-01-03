@@ -37,8 +37,7 @@ import { AdminModule, AdminRole, PermissionAction } from '../types';
 const mockModules: AdminModule[] = [
   // Content Modules
   { id: 'MOD-POSTS', key: 'posts', name: 'Bài viết & Danh mục', description: 'Quản lý bài viết, tin tức, blog và danh mục bài viết', icon: 'FileText', category: 'content', enabled: true, isCore: false, permissions: ['view', 'create', 'edit', 'delete'], order: 1, updatedAt: '2 giờ trước', updatedBy: 'admin' },
-  { id: 'MOD-MEDIA', key: 'media', name: 'Thư viện Media', description: 'Quản lý hình ảnh, video, tài liệu', icon: 'Image', category: 'content', enabled: true, isCore: true, permissions: ['view', 'create', 'delete'], order: 2, updatedAt: '1 ngày trước', updatedBy: 'admin' },
-  { id: 'MOD-COMMENTS', key: 'comments', name: 'Bình luận', description: 'Quản lý và kiểm duyệt bình luận', icon: 'MessageSquare', category: 'content', enabled: true, isCore: false, permissions: ['view', 'edit', 'delete'], order: 3, updatedAt: '1 tuần trước', updatedBy: 'admin' },
+  { id: 'MOD-MEDIA', key: 'media', name: 'Thư viện Media', description: 'Quản lý hình ảnh, video, tài liệu', icon: 'Image', category: 'content', enabled: true, isCore: false, permissions: ['view', 'create', 'delete'], order: 2, updatedAt: '1 ngày trước', updatedBy: 'admin' },
   
   // Commerce Modules
   { id: 'MOD-PRODUCTS', key: 'products', name: 'Sản phẩm & Danh mục', description: 'Quản lý sản phẩm, danh mục sản phẩm, kho hàng', icon: 'Package', category: 'commerce', enabled: true, isCore: true, permissions: ['view', 'create', 'edit', 'delete', 'import', 'export'], order: 4, updatedAt: '30 phút trước', updatedBy: 'editor' },

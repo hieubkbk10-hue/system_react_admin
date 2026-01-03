@@ -4,6 +4,7 @@ import { Layout } from './components/Layout';
 import { Overview } from './pages/Overview';
 import { ModuleManagement } from './pages/ModuleManagement';
 import { PostsModuleConfig } from './pages/modules/PostsModuleConfig';
+import { MediaModuleConfig } from './pages/modules/MediaModuleConfig';
 import { AnalyticsIntegrations } from './pages/Integrations';
 import { SEOConfig } from './pages/Config';
 
@@ -18,6 +19,7 @@ const App: React.FC = () => {
           {/* Module Management */}
           <Route path="modules" element={<ModuleManagement />} />
           <Route path="modules/posts" element={<PostsModuleConfig />} />
+          <Route path="modules/media" element={<MediaModuleConfig />} />
 
           {/* System Config */}
           <Route path="integrations" element={<AnalyticsIntegrations />} />
