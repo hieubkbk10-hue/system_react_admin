@@ -166,6 +166,10 @@ const moduleConfigRoutes: Record<string, string> = {
   'MOD-SETTINGS': '/modules/settings',
   'MOD-MENUS': '/modules/menus',
   'MOD-HOMEPAGE': '/modules/homepage',
+  // Marketing
+  'MOD-NOTIFICATIONS': '/modules/notifications',
+  'MOD-PROMOTIONS': '/modules/promotions',
+  'MOD-ANALYTICS': '/modules/analytics',
 };
 
 // Component: Module Card

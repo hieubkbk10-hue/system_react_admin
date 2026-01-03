@@ -16,6 +16,9 @@ import { RolesModuleConfig } from './pages/modules/RolesModuleConfig';
 import { SettingsModuleConfig } from './pages/modules/SettingsModuleConfig';
 import { MenusModuleConfig } from './pages/modules/MenusModuleConfig';
 import { HomepageModuleConfig } from './pages/modules/HomepageModuleConfig';
+import { NotificationsModuleConfig } from './pages/modules/NotificationsModuleConfig';
+import { PromotionsModuleConfig } from './pages/modules/PromotionsModuleConfig';
+import { AnalyticsModuleConfig } from './pages/modules/AnalyticsModuleConfig';
 import { AnalyticsIntegrations } from './pages/Integrations';
 import { SEOConfig } from './pages/Config';
 
@@ -46,6 +49,10 @@ const App: React.FC = () => {
           <Route path="modules/settings" element={<SettingsModuleConfig />} />
           <Route path="modules/menus" element={<MenusModuleConfig />} />
           <Route path="modules/homepage" element={<HomepageModuleConfig />} />
+          {/* Marketing Modules */}
+          <Route path="modules/notifications" element={<NotificationsModuleConfig />} />
+          <Route path="modules/promotions" element={<PromotionsModuleConfig />} />
+          <Route path="modules/analytics" element={<AnalyticsModuleConfig />} />
 
           {/* System Config */}
           <Route path="integrations" element={<AnalyticsIntegrations />} />
