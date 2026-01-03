@@ -5,6 +5,11 @@ import { Overview } from './pages/Overview';
 import { ModuleManagement } from './pages/ModuleManagement';
 import { PostsModuleConfig } from './pages/modules/PostsModuleConfig';
 import { MediaModuleConfig } from './pages/modules/MediaModuleConfig';
+import { ProductsModuleConfig } from './pages/modules/ProductsModuleConfig';
+import { CartModuleConfig } from './pages/modules/CartModuleConfig';
+import { WishlistModuleConfig } from './pages/modules/WishlistModuleConfig';
+import { OrdersModuleConfig } from './pages/modules/OrdersModuleConfig';
+import { CommentsModuleConfig } from './pages/modules/CommentsModuleConfig';
 import { AnalyticsIntegrations } from './pages/Integrations';
 import { SEOConfig } from './pages/Config';
 
@@ -18,8 +23,15 @@ const App: React.FC = () => {
           
           {/* Module Management */}
           <Route path="modules" element={<ModuleManagement />} />
+          {/* Content Modules */}
           <Route path="modules/posts" element={<PostsModuleConfig />} />
+          <Route path="modules/comments" element={<CommentsModuleConfig />} />
           <Route path="modules/media" element={<MediaModuleConfig />} />
+          {/* Commerce Modules */}
+          <Route path="modules/products" element={<ProductsModuleConfig />} />
+          <Route path="modules/cart" element={<CartModuleConfig />} />
+          <Route path="modules/wishlist" element={<WishlistModuleConfig />} />
+          <Route path="modules/orders" element={<OrdersModuleConfig />} />
 
           {/* System Config */}
           <Route path="integrations" element={<AnalyticsIntegrations />} />

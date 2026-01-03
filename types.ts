@@ -58,6 +58,7 @@ export interface AdminModule {
   enabled: boolean;
   isCore: boolean; // Core modules cannot be disabled
   dependencies?: string[]; // Module IDs that this module depends on
+  dependencyType?: 'all' | 'any'; // 'all' = AND (default), 'any' = OR (chỉ cần 1 parent bật)
   permissions: PermissionAction[];
   order: number;
   updatedAt: string;

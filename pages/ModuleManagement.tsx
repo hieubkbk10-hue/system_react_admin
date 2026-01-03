@@ -9,7 +9,8 @@ import {
   Users, 
   Package, 
   FileText, 
-  ShoppingCart, 
+  ShoppingCart,
+  ShoppingBag,
   Heart, 
   FolderTree, 
   MessageSquare, 
@@ -37,11 +38,12 @@ import { AdminModule, AdminRole, PermissionAction } from '../types';
 const mockModules: AdminModule[] = [
   // Content Modules
   { id: 'MOD-POSTS', key: 'posts', name: 'Bài viết & Danh mục', description: 'Quản lý bài viết, tin tức, blog và danh mục bài viết', icon: 'FileText', category: 'content', enabled: true, isCore: false, permissions: ['view', 'create', 'edit', 'delete'], order: 1, updatedAt: '2 giờ trước', updatedBy: 'admin' },
-  { id: 'MOD-MEDIA', key: 'media', name: 'Thư viện Media', description: 'Quản lý hình ảnh, video, tài liệu', icon: 'Image', category: 'content', enabled: true, isCore: false, permissions: ['view', 'create', 'delete'], order: 2, updatedAt: '1 ngày trước', updatedBy: 'admin' },
+  { id: 'MOD-COMMENTS', key: 'comments', name: 'Bình luận', description: 'Bình luận cho bài viết và đánh giá sản phẩm', icon: 'MessageSquare', category: 'content', enabled: true, isCore: false, dependencies: ['MOD-POSTS', 'MOD-PRODUCTS'], dependencyType: 'any', permissions: ['view', 'edit', 'delete'], order: 2, updatedAt: '1 giờ trước', updatedBy: 'admin' },
+  { id: 'MOD-MEDIA', key: 'media', name: 'Thư viện Media', description: 'Quản lý hình ảnh, video, tài liệu', icon: 'Image', category: 'content', enabled: true, isCore: false, permissions: ['view', 'create', 'delete'], order: 3, updatedAt: '1 ngày trước', updatedBy: 'admin' },
   
   // Commerce Modules
-  { id: 'MOD-PRODUCTS', key: 'products', name: 'Sản phẩm & Danh mục', description: 'Quản lý sản phẩm, danh mục sản phẩm, kho hàng', icon: 'Package', category: 'commerce', enabled: true, isCore: true, permissions: ['view', 'create', 'edit', 'delete', 'import', 'export'], order: 4, updatedAt: '30 phút trước', updatedBy: 'editor' },
-  { id: 'MOD-ORDERS', key: 'orders', name: 'Đơn hàng', description: 'Quản lý đơn hàng, vận chuyển', icon: 'ShoppingCart', category: 'commerce', enabled: true, isCore: true, dependencies: ['MOD-PRODUCTS', 'MOD-CUSTOMERS'], permissions: ['view', 'create', 'edit', 'delete', 'export'], order: 5, updatedAt: '15 phút trước', updatedBy: 'admin' },
+  { id: 'MOD-PRODUCTS', key: 'products', name: 'Sản phẩm & Danh mục', description: 'Quản lý sản phẩm, danh mục sản phẩm, kho hàng', icon: 'Package', category: 'commerce', enabled: true, isCore: false, permissions: ['view', 'create', 'edit', 'delete', 'import', 'export'], order: 4, updatedAt: '30 phút trước', updatedBy: 'editor' },
+  { id: 'MOD-ORDERS', key: 'orders', name: 'Đơn hàng', description: 'Quản lý đơn hàng, vận chuyển', icon: 'ShoppingBag', category: 'commerce', enabled: true, isCore: false, dependencies: ['MOD-PRODUCTS', 'MOD-CUSTOMERS'], permissions: ['view', 'create', 'edit', 'delete', 'export'], order: 5, updatedAt: '15 phút trước', updatedBy: 'admin' },
   { id: 'MOD-CART', key: 'cart', name: 'Giỏ hàng', description: 'Chức năng giỏ hàng cho khách', icon: 'ShoppingCart', category: 'commerce', enabled: true, isCore: false, dependencies: ['MOD-PRODUCTS'], permissions: ['view'], order: 6, updatedAt: '2 ngày trước', updatedBy: 'admin' },
   { id: 'MOD-WISHLIST', key: 'wishlist', name: 'Sản phẩm yêu thích', description: 'Danh sách sản phẩm yêu thích của khách', icon: 'Heart', category: 'commerce', enabled: false, isCore: false, dependencies: ['MOD-PRODUCTS'], permissions: ['view'], order: 7, updatedAt: '1 tuần trước', updatedBy: 'admin' },
   
@@ -124,7 +126,7 @@ const mockRoles: AdminRole[] = [
 ];
 
 const iconMap: Record<string, any> = {
-  FileText, Image, FolderTree, MessageSquare, Package, ShoppingCart, Heart, 
+  FileText, Image, FolderTree, MessageSquare, Package, ShoppingCart, ShoppingBag, Heart, 
   Users, UserCog, Shield, Settings, Menu, LayoutGrid, Bell, Megaphone, BarChart3
 };
 
@@ -147,19 +149,34 @@ const permissionLabels: Record<PermissionAction, string> = {
 
 // Module config routes mapping
 const moduleConfigRoutes: Record<string, string> = {
+  // Content
   'MOD-POSTS': '/modules/posts',
+  'MOD-COMMENTS': '/modules/comments',
+  'MOD-MEDIA': '/modules/media',
+  // Commerce
   'MOD-PRODUCTS': '/modules/products',
+  'MOD-CART': '/modules/cart',
+  'MOD-WISHLIST': '/modules/wishlist',
   'MOD-ORDERS': '/modules/orders',
+  // User (future)
   'MOD-CUSTOMERS': '/modules/customers',
   'MOD-USERS': '/modules/users',
-  'MOD-MEDIA': '/modules/media',
 };
 
 // Component: Module Card
-const ModuleCard = ({ module, onToggle }: { module: AdminModule; onToggle: (id: string) => void }) => {
+const ModuleCard = ({ module, onToggle, canToggle, allModules }: { 
+  module: AdminModule; 
+  onToggle: (id: string) => void;
+  canToggle: boolean;
+  allModules: AdminModule[];
+}) => {
   const Icon = iconMap[module.icon] || Package;
   const category = categoryLabels[module.category];
   const configRoute = moduleConfigRoutes[module.id];
+  const isDisabled = module.isCore || !canToggle;
+  
+  // Check if this module has dependents that are enabled
+  const hasDependents = allModules.some(m => m.dependencies?.includes(module.id) && m.enabled);
   
   return (
     <div className={`bg-white dark:bg-slate-900 border rounded-lg p-4 transition-all ${
@@ -184,6 +201,11 @@ const ModuleCard = ({ module, onToggle }: { module: AdminModule; onToggle: (id: 
                   CORE
                 </span>
               )}
+              {hasDependents && module.enabled && (
+                <span className="text-[9px] px-1.5 py-0.5 rounded bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20 font-medium">
+                  PARENT
+                </span>
+              )}
             </div>
             <p className="text-xs text-slate-500 line-clamp-2">{module.description}</p>
             <div className="flex items-center gap-2 mt-2">
@@ -196,10 +218,11 @@ const ModuleCard = ({ module, onToggle }: { module: AdminModule; onToggle: (id: 
         
         <div className="flex flex-col items-end gap-2">
           <button 
-            onClick={() => !module.isCore && onToggle(module.id)}
-            disabled={module.isCore}
+            onClick={() => !isDisabled && onToggle(module.id)}
+            disabled={isDisabled}
+            title={!canToggle && !module.isCore ? 'Bật module phụ thuộc trước' : undefined}
             className={`relative w-11 h-6 rounded-full transition-colors ${
-              module.isCore 
+              isDisabled 
                 ? 'bg-slate-200 dark:bg-slate-700 cursor-not-allowed' 
                 : module.enabled 
                   ? 'bg-cyan-500 cursor-pointer' 
@@ -212,6 +235,9 @@ const ModuleCard = ({ module, onToggle }: { module: AdminModule; onToggle: (id: 
           </button>
           {module.isCore && (
             <Lock size={12} className="text-slate-400" />
+          )}
+          {!canToggle && !module.isCore && (
+            <span className="text-[9px] text-rose-500">Cần bật parent</span>
           )}
         </div>
       </div>
@@ -305,9 +331,57 @@ export const ModuleManagement: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   
   const handleToggleModule = (id: string) => {
-    setModules(prev => prev.map(m => 
-      m.id === id ? { ...m, enabled: !m.enabled } : m
-    ));
+    setModules(prev => {
+      const targetModule = prev.find(m => m.id === id);
+      if (!targetModule) return prev;
+      
+      const newEnabled = !targetModule.enabled;
+      
+      return prev.map(m => {
+        // Toggle the target module
+        if (m.id === id) {
+          return { ...m, enabled: newEnabled };
+        }
+        
+        // If turning OFF a parent module, check dependent modules
+        if (!newEnabled && m.dependencies?.includes(id)) {
+          // Check dependency type
+          if (m.dependencyType === 'any') {
+            // OR logic: only disable if ALL parents are now off
+            const otherParentsEnabled = m.dependencies
+              .filter(depId => depId !== id)
+              .some(depId => prev.find(pm => pm.id === depId)?.enabled);
+            
+            if (!otherParentsEnabled) {
+              return { ...m, enabled: false };
+            }
+          } else {
+            // AND logic (default): disable immediately when any parent is off
+            return { ...m, enabled: false };
+          }
+        }
+        
+        return m;
+      });
+    });
+  };
+  
+  // Check if module can be toggled (dependencies must be enabled)
+  const canToggleModule = (module: AdminModule): boolean => {
+    if (module.isCore) return false;
+    if (!module.dependencies || module.dependencies.length === 0) return true;
+    
+    if (module.dependencyType === 'any') {
+      // OR logic: at least one dependency must be enabled
+      return module.dependencies.some(depId => 
+        modules.find(m => m.id === depId)?.enabled
+      );
+    } else {
+      // AND logic (default): all dependencies must be enabled
+      return module.dependencies.every(depId => 
+        modules.find(m => m.id === depId)?.enabled
+      );
+    }
   };
   
   const filteredModules = modules.filter(m => {
@@ -421,7 +495,13 @@ export const ModuleManagement: React.FC = () => {
                 </h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                   {mods.map(module => (
-                    <ModuleCard key={module.id} module={module} onToggle={handleToggleModule} />
+                    <ModuleCard 
+                      key={module.id} 
+                      module={module} 
+                      onToggle={handleToggleModule}
+                      canToggle={canToggleModule(module)}
+                      allModules={modules}
+                    />
                   ))}
                 </div>
               </div>
