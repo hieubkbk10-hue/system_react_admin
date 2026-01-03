@@ -1,0 +1,5 @@
+{
+  "name": "System Developer Console",
+  "description": "High-level system configuration, monitoring, and feature flag management dashboard for developers and DevOps.",
+  "requestFramePermissions": []
+}
