@@ -164,12 +164,12 @@ const moduleConfigRoutes: Record<string, string> = {
 };
 
 // Component: Module Card
-const ModuleCard = ({ module, onToggle, canToggle, allModules }: { 
+const ModuleCard: React.FC<{ 
   module: AdminModule; 
   onToggle: (id: string) => void;
   canToggle: boolean;
   allModules: AdminModule[];
-}) => {
+}> = ({ module, onToggle, canToggle, allModules }) => {
   const Icon = iconMap[module.icon] || Package;
   const category = categoryLabels[module.category];
   const configRoute = moduleConfigRoutes[module.id];
@@ -266,7 +266,7 @@ const ModuleCard = ({ module, onToggle, canToggle, allModules }: {
 };
 
 // Component: Role Card
-const RoleCard = ({ role, onEdit }: { role: AdminRole; onEdit: (role: AdminRole) => void }) => {
+const RoleCard: React.FC<{ role: AdminRole; onEdit: (role: AdminRole) => void }> = ({ role, onEdit }) => {
   const colorMap: Record<string, string> = {
     rose: 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/20',
     cyan: 'bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 border-cyan-500/20',
@@ -491,10 +491,10 @@ export const ModuleManagement: React.FC = () => {
               <div key={category}>
                 <h3 className={`text-sm font-semibold mb-3 flex items-center gap-2 ${categoryLabels[category].color}`}>
                   {categoryLabels[category].label}
-                  <span className="text-xs font-normal text-slate-500">({mods.length})</span>
+                  <span className="text-xs font-normal text-slate-500">({(mods as AdminModule[]).length})</span>
                 </h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {mods.map(module => (
+                  {(mods as AdminModule[]).map(module => (
                     <ModuleCard 
                       key={module.id} 
                       module={module} 

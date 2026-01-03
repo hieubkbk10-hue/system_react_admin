@@ -46,7 +46,7 @@ const ToggleSwitch = ({ enabled, onChange, disabled = false }: { enabled: boolea
   </button>
 );
 
-const FieldRow = ({ field, onToggle }: { field: FieldConfig; onToggle: (id: string) => void }) => {
+const FieldRow: React.FC<{ field: FieldConfig; onToggle: (id: string) => void }> = ({ field, onToggle }) => {
   const TypeIcon = fieldTypeIcons[field.type] || FileText;
   
   return (

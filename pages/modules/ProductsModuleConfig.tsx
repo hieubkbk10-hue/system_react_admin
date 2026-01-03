@@ -63,7 +63,7 @@ const ToggleSwitch = ({ enabled, onChange, disabled = false }: { enabled: boolea
   </button>
 );
 
-const FieldRow = ({ field, onToggle, color = 'emerald' }: { field: FieldConfig; onToggle: (id: string) => void; color?: 'emerald' | 'amber' }) => {
+const FieldRow: React.FC<{ field: FieldConfig; onToggle: (id: string) => void; color?: 'emerald' | 'amber' }> = ({ field, onToggle, color = 'emerald' }) => {
   const TypeIcon = fieldTypeIcons[field.type] || FileText;
   const colorClasses = color === 'emerald' 
     ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400'
