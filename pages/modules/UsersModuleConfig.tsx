@@ -9,12 +9,12 @@ import {
   Info,
   Hash,
   Mail,
-  Phone,
   Shield,
   Key,
   Image,
   FileText,
-  Lock
+  Lock,
+  Layers
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
@@ -22,7 +22,7 @@ interface FieldConfig {
   id: string;
   name: string;
   key: string;
-  type: 'text' | 'email' | 'phone' | 'image' | 'select' | 'boolean' | 'password';
+  type: 'text' | 'email' | 'image' | 'select' | 'boolean' | 'password';
   required: boolean;
   enabled: boolean;
   isSystem: boolean;
@@ -31,7 +31,6 @@ interface FieldConfig {
 const fieldTypeIcons: Record<string, any> = {
   text: Hash,
   email: Mail,
-  phone: Phone,
   image: Image,
   select: Shield,
   boolean: ToggleLeft,
@@ -92,13 +91,15 @@ const FieldRow: React.FC<{ field: FieldConfig; onToggle: (id: string) => void }>
 export const UsersModuleConfig: React.FC = () => {
   const navigate = useNavigate();
   
+  const [features, setFeatures] = useState({
+    enableAvatar: false,
+  });
+  
   const [userFields, setUserFields] = useState<FieldConfig[]>([
-    // Required (system) - RBAC essentials
     { id: 'U1', name: 'Email', key: 'email', type: 'email', required: true, enabled: true, isSystem: true },
     { id: 'U2', name: 'Mật khẩu', key: 'password', type: 'password', required: true, enabled: true, isSystem: true },
     { id: 'U3', name: 'Vai trò', key: 'role_id', type: 'select', required: true, enabled: true, isSystem: true },
     { id: 'U4', name: 'Trạng thái', key: 'active', type: 'boolean', required: true, enabled: true, isSystem: true },
-    // Optional
     { id: 'U5', name: 'Họ và tên', key: 'full_name', type: 'text', required: false, enabled: true, isSystem: false },
     { id: 'U6', name: 'Ảnh đại diện', key: 'avatar', type: 'image', required: false, enabled: false, isSystem: false },
   ]);
@@ -108,15 +109,30 @@ export const UsersModuleConfig: React.FC = () => {
     maxLoginAttempts: 5,
   });
   
+  const handleToggleFeature = (key: string) => {
+    setFeatures(prev => {
+      const newValue = !(prev as any)[key];
+      if (key === 'enableAvatar') {
+        setUserFields(fields => fields.map(f => f.key === 'avatar' ? { ...f, enabled: newValue } : f));
+      }
+      return { ...prev, [key]: newValue };
+    });
+  };
+  
   const handleToggleUserField = (id: string) => {
-    setUserFields(prev => prev.map(f => f.id === id ? { ...f, enabled: !f.enabled } : f));
+    const field = userFields.find(f => f.id === id);
+    if (field?.key === 'avatar') {
+      handleToggleFeature('enableAvatar');
+    } else {
+      setUserFields(prev => prev.map(f => f.id === id ? { ...f, enabled: !f.enabled } : f));
+    }
   };
   
   const requiredFields = userFields.filter(f => f.required);
   const optionalFields = userFields.filter(f => !f.required);
   
   return (
-    <div className="space-y-6 max-w-3xl mx-auto">
+    <div className="space-y-6 max-w-4xl mx-auto">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
@@ -153,34 +169,57 @@ export const UsersModuleConfig: React.FC = () => {
         <Lock size={16} className="text-slate-400" />
       </div>
       
-      {/* Main Content - 2 Columns */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      {/* Main Content - 3 Columns */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         
-        {/* Column 1: Settings */}
-        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg p-4">
-          <h3 className="text-sm font-semibold text-slate-800 dark:text-slate-200 mb-3 flex items-center gap-2">
-            <Settings size={14} className="text-slate-500" /> Cài đặt bảo mật
-          </h3>
-          
-          <div className="space-y-3">
-            <div>
-              <label className="text-xs text-slate-500 mb-1 block">Session timeout (phút)</label>
-              <input 
-                type="number" 
-                value={settings.sessionTimeout}
-                onChange={(e) => setSettings({...settings, sessionTimeout: parseInt(e.target.value)})}
-                className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-sm outline-none focus:border-purple-500"
-              />
-            </div>
+        {/* Column 1: Settings & Features */}
+        <div className="space-y-4">
+          {/* Settings */}
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg p-4">
+            <h3 className="text-sm font-semibold text-slate-800 dark:text-slate-200 mb-3 flex items-center gap-2">
+              <Settings size={14} className="text-slate-500" /> Cài đặt
+            </h3>
             
-            <div>
-              <label className="text-xs text-slate-500 mb-1 block">Max đăng nhập sai</label>
-              <input 
-                type="number" 
-                value={settings.maxLoginAttempts}
-                onChange={(e) => setSettings({...settings, maxLoginAttempts: parseInt(e.target.value)})}
-                className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-sm outline-none focus:border-purple-500"
-              />
+            <div className="space-y-3">
+              <div>
+                <label className="text-xs text-slate-500 mb-1 block">Session timeout (phút)</label>
+                <input 
+                  type="number" 
+                  value={settings.sessionTimeout}
+                  onChange={(e) => setSettings({...settings, sessionTimeout: parseInt(e.target.value)})}
+                  className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-sm outline-none focus:border-purple-500"
+                />
+              </div>
+              
+              <div>
+                <label className="text-xs text-slate-500 mb-1 block">Max đăng nhập sai</label>
+                <input 
+                  type="number" 
+                  value={settings.maxLoginAttempts}
+                  onChange={(e) => setSettings({...settings, maxLoginAttempts: parseInt(e.target.value)})}
+                  className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-sm outline-none focus:border-purple-500"
+                />
+              </div>
+            </div>
+          </div>
+          
+          {/* Features */}
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg p-4">
+            <h3 className="text-sm font-semibold text-slate-800 dark:text-slate-200 mb-3 flex items-center gap-2">
+              <Layers size={14} className="text-slate-500" /> Tính năng
+            </h3>
+            
+            <div className="space-y-2">
+              <div className="flex items-center justify-between p-2 rounded-lg bg-slate-50 dark:bg-slate-950">
+                <div className="flex items-center gap-2">
+                  <Image size={14} className="text-slate-400" />
+                  <span className="text-sm text-slate-700 dark:text-slate-200">Ảnh đại diện</span>
+                </div>
+                <ToggleSwitch 
+                  enabled={features.enableAvatar} 
+                  onChange={() => handleToggleFeature('enableAvatar')}
+                />
+              </div>
             </div>
           </div>
         </div>
@@ -209,16 +248,19 @@ export const UsersModuleConfig: React.FC = () => {
             )}
           </div>
         </div>
-      </div>
-      
-      {/* Module Link */}
-      <div className="bg-slate-100 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-lg p-4">
-        <div className="flex items-center justify-between p-3 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
-          <div className="flex items-center gap-2">
-            <Shield size={14} className="text-purple-500" />
-            <span className="text-sm text-slate-700 dark:text-slate-200">Vai trò & Quyền</span>
+        
+        {/* Column 3: Module Link */}
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg p-4">
+          <h3 className="text-sm font-semibold text-slate-800 dark:text-slate-200 mb-3 flex items-center gap-2">
+            <Layers size={14} className="text-slate-500" /> Module liên quan
+          </h3>
+          <div className="flex items-center justify-between p-3 rounded-lg bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800">
+            <div className="flex items-center gap-2">
+              <Shield size={14} className="text-purple-500" />
+              <span className="text-sm text-slate-700 dark:text-slate-200">Vai trò & Quyền</span>
+            </div>
+            <a href="#/modules/roles" className="text-[11px] text-purple-600 dark:text-purple-400 hover:underline">Cấu hình →</a>
           </div>
-          <a href="#/modules/roles" className="text-[11px] text-purple-600 dark:text-purple-400 hover:underline">Cấu hình →</a>
         </div>
       </div>
       

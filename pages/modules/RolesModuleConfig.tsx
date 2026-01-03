@@ -3,12 +3,14 @@ import {
   ArrowLeft, 
   Save, 
   Shield, 
+  Settings,
   ToggleLeft,
   Check,
   Info,
   Hash,
   FileText,
-  Lock
+  Lock,
+  Layers
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
@@ -82,25 +84,46 @@ const FieldRow: React.FC<{ field: FieldConfig; onToggle: (id: string) => void }>
 export const RolesModuleConfig: React.FC = () => {
   const navigate = useNavigate();
   
+  const [features, setFeatures] = useState({
+    enableDescription: true,
+  });
+  
   const [roleFields, setRoleFields] = useState<FieldConfig[]>([
-    // Required (system)
     { id: 'R1', name: 'Tên vai trò', key: 'name', type: 'text', required: true, enabled: true, isSystem: true },
     { id: 'R2', name: 'Permissions', key: 'permissions', type: 'text', required: true, enabled: true, isSystem: true },
     { id: 'R3', name: 'Thứ tự', key: 'order', type: 'text', required: true, enabled: true, isSystem: true },
     { id: 'R4', name: 'Trạng thái', key: 'active', type: 'boolean', required: true, enabled: true, isSystem: true },
-    // Optional
     { id: 'R5', name: 'Mô tả', key: 'description', type: 'textarea', required: false, enabled: true, isSystem: false },
   ]);
   
+  const [settings, setSettings] = useState({
+    maxRolesPerUser: 1,
+  });
+  
+  const handleToggleFeature = (key: string) => {
+    setFeatures(prev => {
+      const newValue = !(prev as any)[key];
+      if (key === 'enableDescription') {
+        setRoleFields(fields => fields.map(f => f.key === 'description' ? { ...f, enabled: newValue } : f));
+      }
+      return { ...prev, [key]: newValue };
+    });
+  };
+  
   const handleToggleRoleField = (id: string) => {
-    setRoleFields(prev => prev.map(f => f.id === id ? { ...f, enabled: !f.enabled } : f));
+    const field = roleFields.find(f => f.id === id);
+    if (field?.key === 'description') {
+      handleToggleFeature('enableDescription');
+    } else {
+      setRoleFields(prev => prev.map(f => f.id === id ? { ...f, enabled: !f.enabled } : f));
+    }
   };
   
   const requiredFields = roleFields.filter(f => f.required);
   const optionalFields = roleFields.filter(f => !f.required);
   
   return (
-    <div className="space-y-6 max-w-3xl mx-auto">
+    <div className="space-y-6 max-w-4xl mx-auto">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
@@ -137,44 +160,89 @@ export const RolesModuleConfig: React.FC = () => {
         <Lock size={16} className="text-slate-400" />
       </div>
       
-      {/* Role Fields */}
-      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg p-4">
-        <h3 className="text-sm font-semibold text-slate-800 dark:text-slate-200 mb-3 flex items-center gap-2">
-          <Shield size={14} className="text-violet-500" /> Trường vai trò
-        </h3>
+      {/* Main Content - 3 Columns */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         
-        <div className="space-y-3">
-          <div className="space-y-1.5">
-            <span className="text-[10px] font-semibold text-slate-400 uppercase">Bắt buộc</span>
-            {requiredFields.map(field => (
-              <FieldRow key={field.id} field={field} onToggle={handleToggleRoleField} />
-            ))}
+        {/* Column 1: Settings & Features */}
+        <div className="space-y-4">
+          {/* Settings */}
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg p-4">
+            <h3 className="text-sm font-semibold text-slate-800 dark:text-slate-200 mb-3 flex items-center gap-2">
+              <Settings size={14} className="text-slate-500" /> Cài đặt
+            </h3>
+            
+            <div>
+              <label className="text-xs text-slate-500 mb-1 block">Max roles / user</label>
+              <input 
+                type="number" 
+                value={settings.maxRolesPerUser}
+                onChange={(e) => setSettings({...settings, maxRolesPerUser: parseInt(e.target.value)})}
+                className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-sm outline-none focus:border-violet-500"
+              />
+            </div>
           </div>
           
-          {optionalFields.length > 0 && (
+          {/* Features */}
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg p-4">
+            <h3 className="text-sm font-semibold text-slate-800 dark:text-slate-200 mb-3 flex items-center gap-2">
+              <Layers size={14} className="text-slate-500" /> Tính năng
+            </h3>
+            
+            <div className="space-y-2">
+              <div className="flex items-center justify-between p-2 rounded-lg bg-slate-50 dark:bg-slate-950">
+                <div className="flex items-center gap-2">
+                  <FileText size={14} className="text-slate-400" />
+                  <span className="text-sm text-slate-700 dark:text-slate-200">Mô tả vai trò</span>
+                </div>
+                <ToggleSwitch 
+                  enabled={features.enableDescription} 
+                  onChange={() => handleToggleFeature('enableDescription')}
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        {/* Column 2: Role Fields */}
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg p-4">
+          <h3 className="text-sm font-semibold text-slate-800 dark:text-slate-200 mb-3 flex items-center gap-2">
+            <Shield size={14} className="text-violet-500" /> Trường vai trò
+          </h3>
+          
+          <div className="space-y-3">
             <div className="space-y-1.5">
-              <span className="text-[10px] font-semibold text-slate-400 uppercase">Tùy chọn</span>
-              {optionalFields.map(field => (
+              <span className="text-[10px] font-semibold text-slate-400 uppercase">Bắt buộc</span>
+              {requiredFields.map(field => (
                 <FieldRow key={field.id} field={field} onToggle={handleToggleRoleField} />
               ))}
             </div>
-          )}
+            
+            {optionalFields.length > 0 && (
+              <div className="space-y-1.5">
+                <span className="text-[10px] font-semibold text-slate-400 uppercase">Tùy chọn</span>
+                {optionalFields.map(field => (
+                  <FieldRow key={field.id} field={field} onToggle={handleToggleRoleField} />
+                ))}
+              </div>
+            )}
+          </div>
         </div>
-      </div>
-      
-      {/* Permissions Info */}
-      <div className="bg-slate-100 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-lg p-4">
-        <h3 className="text-sm font-semibold text-slate-800 dark:text-slate-200 mb-3">Quyền cơ bản</h3>
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-          {['view', 'create', 'edit', 'delete'].map((perm) => (
-            <div key={perm} className="p-2 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-center">
-              <code className="text-xs text-violet-600 dark:text-violet-400">{perm}</code>
-            </div>
-          ))}
+        
+        {/* Column 3: Permissions Info */}
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg p-4">
+          <h3 className="text-sm font-semibold text-slate-800 dark:text-slate-200 mb-3">Quyền cơ bản</h3>
+          <div className="grid grid-cols-2 gap-2">
+            {['view', 'create', 'edit', 'delete'].map((perm) => (
+              <div key={perm} className="p-2 rounded-lg bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-center">
+                <code className="text-xs text-violet-600 dark:text-violet-400">{perm}</code>
+              </div>
+            ))}
+          </div>
+          <p className="text-[10px] text-slate-500 mt-3">
+            * Permissions lưu dạng JSON:<br/>
+            <code className="text-violet-500">{`{"posts": ["view", "create"]}`}</code>
+          </p>
         </div>
-        <p className="text-[10px] text-slate-500 mt-2">
-          * Permissions lưu dạng JSON: {`{"posts": ["view", "create"], "products": ["view"]}`}
-        </p>
       </div>
       
       {/* Convention Note */}

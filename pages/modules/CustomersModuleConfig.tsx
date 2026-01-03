@@ -12,7 +12,8 @@ import {
   Phone,
   Image,
   FileText,
-  Lock
+  Lock,
+  Layers
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
@@ -88,14 +89,16 @@ const FieldRow: React.FC<{ field: FieldConfig; onToggle: (id: string) => void }>
 export const CustomersModuleConfig: React.FC = () => {
   const navigate = useNavigate();
   
+  const [features, setFeatures] = useState({
+    enableAvatar: false,
+  });
+  
   const [customerFields, setCustomerFields] = useState<FieldConfig[]>([
-    // Required (system)
     { id: 'C1', name: 'Họ và tên', key: 'full_name', type: 'text', required: true, enabled: true, isSystem: true },
     { id: 'C2', name: 'Email', key: 'email', type: 'email', required: true, enabled: true, isSystem: true },
     { id: 'C3', name: 'Số điện thoại', key: 'phone', type: 'phone', required: true, enabled: true, isSystem: true },
     { id: 'C4', name: 'Thứ tự', key: 'order', type: 'text', required: true, enabled: true, isSystem: true },
     { id: 'C5', name: 'Trạng thái', key: 'active', type: 'boolean', required: true, enabled: true, isSystem: true },
-    // Optional
     { id: 'C6', name: 'Ảnh đại diện', key: 'avatar', type: 'image', required: false, enabled: false, isSystem: false },
   ]);
   
@@ -103,15 +106,30 @@ export const CustomersModuleConfig: React.FC = () => {
     customersPerPage: 20,
   });
   
+  const handleToggleFeature = (key: string) => {
+    setFeatures(prev => {
+      const newValue = !(prev as any)[key];
+      if (key === 'enableAvatar') {
+        setCustomerFields(fields => fields.map(f => f.key === 'avatar' ? { ...f, enabled: newValue } : f));
+      }
+      return { ...prev, [key]: newValue };
+    });
+  };
+  
   const handleToggleCustomerField = (id: string) => {
-    setCustomerFields(prev => prev.map(f => f.id === id ? { ...f, enabled: !f.enabled } : f));
+    const field = customerFields.find(f => f.id === id);
+    if (field?.key === 'avatar') {
+      handleToggleFeature('enableAvatar');
+    } else {
+      setCustomerFields(prev => prev.map(f => f.id === id ? { ...f, enabled: !f.enabled } : f));
+    }
   };
   
   const requiredFields = customerFields.filter(f => f.required);
   const optionalFields = customerFields.filter(f => !f.required);
   
   return (
-    <div className="space-y-6 max-w-3xl mx-auto">
+    <div className="space-y-6 max-w-4xl mx-auto">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
@@ -148,28 +166,51 @@ export const CustomersModuleConfig: React.FC = () => {
         <Lock size={16} className="text-slate-400" />
       </div>
       
-      {/* Main Content - 2 Columns */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      {/* Main Content - 3 Columns */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         
-        {/* Column 1: Settings */}
-        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg p-4">
-          <h3 className="text-sm font-semibold text-slate-800 dark:text-slate-200 mb-3 flex items-center gap-2">
-            <Settings size={14} className="text-slate-500" /> Cài đặt
-          </h3>
+        {/* Column 1: Settings & Features */}
+        <div className="space-y-4">
+          {/* Settings */}
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg p-4">
+            <h3 className="text-sm font-semibold text-slate-800 dark:text-slate-200 mb-3 flex items-center gap-2">
+              <Settings size={14} className="text-slate-500" /> Cài đặt
+            </h3>
+            
+            <div>
+              <label className="text-xs text-slate-500 mb-1 block">Số KH / trang</label>
+              <input 
+                type="number" 
+                value={settings.customersPerPage}
+                onChange={(e) => setSettings({...settings, customersPerPage: parseInt(e.target.value)})}
+                className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-sm outline-none focus:border-indigo-500"
+              />
+            </div>
+          </div>
           
-          <div>
-            <label className="text-xs text-slate-500 mb-1 block">Số KH / trang</label>
-            <input 
-              type="number" 
-              value={settings.customersPerPage}
-              onChange={(e) => setSettings({...settings, customersPerPage: parseInt(e.target.value)})}
-              className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-sm outline-none focus:border-indigo-500"
-            />
+          {/* Features */}
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg p-4">
+            <h3 className="text-sm font-semibold text-slate-800 dark:text-slate-200 mb-3 flex items-center gap-2">
+              <Layers size={14} className="text-slate-500" /> Tính năng
+            </h3>
+            
+            <div className="space-y-2">
+              <div className="flex items-center justify-between p-2 rounded-lg bg-slate-50 dark:bg-slate-950">
+                <div className="flex items-center gap-2">
+                  <Image size={14} className="text-slate-400" />
+                  <span className="text-sm text-slate-700 dark:text-slate-200">Ảnh đại diện</span>
+                </div>
+                <ToggleSwitch 
+                  enabled={features.enableAvatar} 
+                  onChange={() => handleToggleFeature('enableAvatar')}
+                />
+              </div>
+            </div>
           </div>
         </div>
         
         {/* Column 2: Customer Fields */}
-        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg p-4">
+        <div className="lg:col-span-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg p-4">
           <h3 className="text-sm font-semibold text-slate-800 dark:text-slate-200 mb-3 flex items-center gap-2">
             <Users size={14} className="text-indigo-500" /> Trường khách hàng
           </h3>
