@@ -158,9 +158,10 @@ const moduleConfigRoutes: Record<string, string> = {
   'MOD-CART': '/modules/cart',
   'MOD-WISHLIST': '/modules/wishlist',
   'MOD-ORDERS': '/modules/orders',
-  // User (future)
+  // User
   'MOD-CUSTOMERS': '/modules/customers',
   'MOD-USERS': '/modules/users',
+  'MOD-ROLES': '/modules/roles',
 };
 
 // Component: Module Card

@@ -10,6 +10,9 @@ import { CartModuleConfig } from './pages/modules/CartModuleConfig';
 import { WishlistModuleConfig } from './pages/modules/WishlistModuleConfig';
 import { OrdersModuleConfig } from './pages/modules/OrdersModuleConfig';
 import { CommentsModuleConfig } from './pages/modules/CommentsModuleConfig';
+import { UsersModuleConfig } from './pages/modules/UsersModuleConfig';
+import { CustomersModuleConfig } from './pages/modules/CustomersModuleConfig';
+import { RolesModuleConfig } from './pages/modules/RolesModuleConfig';
 import { AnalyticsIntegrations } from './pages/Integrations';
 import { SEOConfig } from './pages/Config';
 
@@ -32,6 +35,10 @@ const App: React.FC = () => {
           <Route path="modules/cart" element={<CartModuleConfig />} />
           <Route path="modules/wishlist" element={<WishlistModuleConfig />} />
           <Route path="modules/orders" element={<OrdersModuleConfig />} />
+          {/* User Modules */}
+          <Route path="modules/users" element={<UsersModuleConfig />} />
+          <Route path="modules/customers" element={<CustomersModuleConfig />} />
+          <Route path="modules/roles" element={<RolesModuleConfig />} />
 
           {/* System Config */}
           <Route path="integrations" element={<AnalyticsIntegrations />} />
