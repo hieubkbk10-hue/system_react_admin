@@ -1,18 +1,14 @@
 import React, { useState } from 'react';
 import { 
   Search, 
-  Filter, 
-  Plus, 
   Settings, 
   Shield, 
-  ShieldCheck, 
   Users, 
   Package, 
   FileText, 
   ShoppingCart,
   ShoppingBag,
   Heart, 
-  FolderTree, 
   MessageSquare, 
   Image, 
   LayoutGrid, 
@@ -21,18 +17,13 @@ import {
   Megaphone,
   BarChart3,
   Lock,
-  Unlock,
-  ChevronRight,
-  AlertTriangle,
   Check,
   X,
-  Crown,
   UserCog,
-  Layers,
-  ExternalLink
+  Layers
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { AdminModule, AdminRole, PermissionAction } from '../types';
+import { AdminModule, PermissionAction } from '../types';
 
 // Mock Data - Modules
 const mockModules: AdminModule[] = [
@@ -63,70 +54,8 @@ const mockModules: AdminModule[] = [
   { id: 'MOD-ANALYTICS', key: 'analytics', name: 'Thống kê', description: 'Báo cáo và phân tích dữ liệu', icon: 'BarChart3', category: 'marketing', enabled: true, isCore: false, permissions: ['view', 'export'], order: 17, updatedAt: '12 giờ trước', updatedBy: 'admin' },
 ];
 
-// Mock Data - Roles
-const mockRoles: AdminRole[] = [
-  { 
-    id: 'ROLE-SUPERADMIN', 
-    name: 'Super Admin', 
-    description: 'Quyền cao nhất, quản lý toàn bộ hệ thống', 
-    color: 'rose',
-    isSystem: true,
-    isSuperAdmin: true,
-    usersCount: 1,
-    modulePermissions: mockModules.map(m => ({ moduleId: m.id, actions: m.permissions })),
-    createdAt: '2024-01-01',
-    updatedAt: '2024-01-01'
-  },
-  { 
-    id: 'ROLE-ADMIN', 
-    name: 'Administrator', 
-    description: 'Quản trị viên, truy cập hầu hết chức năng', 
-    color: 'cyan',
-    isSystem: true,
-    isSuperAdmin: false,
-    usersCount: 2,
-    modulePermissions: mockModules.filter(m => m.key !== 'roles').map(m => ({ moduleId: m.id, actions: m.permissions.filter(p => p !== 'delete') })),
-    createdAt: '2024-01-01',
-    updatedAt: '2024-06-15'
-  },
-  { 
-    id: 'ROLE-EDITOR', 
-    name: 'Biên tập viên', 
-    description: 'Quản lý nội dung và sản phẩm', 
-    color: 'emerald',
-    isSystem: false,
-    isSuperAdmin: false,
-    usersCount: 3,
-    modulePermissions: [
-      { moduleId: 'MOD-POSTS', actions: ['view', 'create', 'edit', 'delete'] },
-      { moduleId: 'MOD-MEDIA', actions: ['view', 'create'] },
-      { moduleId: 'MOD-CATEGORIES', actions: ['view'] },
-      { moduleId: 'MOD-PRODUCTS', actions: ['view', 'edit'] },
-      { moduleId: 'MOD-COMMENTS', actions: ['view', 'edit', 'delete'] },
-    ],
-    createdAt: '2024-02-15',
-    updatedAt: '2024-08-20'
-  },
-  { 
-    id: 'ROLE-SALES', 
-    name: 'Nhân viên bán hàng', 
-    description: 'Xử lý đơn hàng và chăm sóc khách', 
-    color: 'amber',
-    isSystem: false,
-    isSuperAdmin: false,
-    usersCount: 5,
-    modulePermissions: [
-      { moduleId: 'MOD-ORDERS', actions: ['view', 'edit'] },
-      { moduleId: 'MOD-CUSTOMERS', actions: ['view', 'edit'] },
-      { moduleId: 'MOD-PRODUCTS', actions: ['view'] },
-    ],
-    createdAt: '2024-03-01',
-    updatedAt: '2024-09-10'
-  },
-];
-
 const iconMap: Record<string, any> = {
-  FileText, Image, FolderTree, MessageSquare, Package, ShoppingCart, ShoppingBag, Heart, 
+  FileText, Image, MessageSquare, Package, ShoppingCart, ShoppingBag, Heart, 
   Users, UserCog, Shield, Settings, Menu, LayoutGrid, Bell, Megaphone, BarChart3
 };
 
@@ -274,68 +203,9 @@ const ModuleCard: React.FC<{
   );
 };
 
-// Component: Role Card
-const RoleCard: React.FC<{ role: AdminRole; onEdit: (role: AdminRole) => void }> = ({ role, onEdit }) => {
-  const colorMap: Record<string, string> = {
-    rose: 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/20',
-    cyan: 'bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 border-cyan-500/20',
-    emerald: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20',
-    amber: 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20',
-  };
-  
-  const enabledModulesCount = role.modulePermissions.length;
-  
-  return (
-    <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg p-4 hover:border-slate-300 dark:hover:border-slate-700 transition-all">
-      <div className="flex items-start justify-between">
-        <div className="flex items-center gap-3">
-          <div className={`w-10 h-10 rounded-lg flex items-center justify-center border ${colorMap[role.color]}`}>
-            {role.isSuperAdmin ? <Crown size={20} /> : <Shield size={20} />}
-          </div>
-          <div>
-            <div className="flex items-center gap-2">
-              <h3 className="text-slate-800 dark:text-slate-200 font-medium">{role.name}</h3>
-              {role.isSystem && (
-                <span className="text-[9px] px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-500 border border-slate-200 dark:border-slate-700">
-                  HỆ THỐNG
-                </span>
-              )}
-              {role.isSuperAdmin && (
-                <span className="text-[9px] px-1.5 py-0.5 rounded bg-rose-500/10 text-rose-500 border border-rose-500/20 font-bold">
-                  SUPER ADMIN
-                </span>
-              )}
-            </div>
-            <p className="text-xs text-slate-500 mt-0.5">{role.description}</p>
-          </div>
-        </div>
-        
-        <button 
-          onClick={() => onEdit(role)}
-          className="text-xs text-cyan-600 dark:text-cyan-400 hover:text-cyan-500 font-medium flex items-center gap-1"
-        >
-          Cấu hình <ChevronRight size={14} />
-        </button>
-      </div>
-      
-      <div className="flex items-center gap-4 mt-4 pt-3 border-t border-slate-100 dark:border-slate-800 text-xs text-slate-500">
-        <div className="flex items-center gap-1">
-          <Users size={12} />
-          <span>{role.usersCount} người dùng</span>
-        </div>
-        <div className="flex items-center gap-1">
-          <Package size={12} />
-          <span>{enabledModulesCount} modules</span>
-        </div>
-      </div>
-    </div>
-  );
-};
-
 // Main Component
 export const ModuleManagement: React.FC = () => {
   const [modules, setModules] = useState(mockModules);
-  const [activeTab, setActiveTab] = useState<'modules' | 'roles'>('modules');
   const [filterCategory, setFilterCategory] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState('');
   
@@ -432,127 +302,63 @@ export const ModuleManagement: React.FC = () => {
         </div>
       </div>
       
-      {/* Tabs */}
-      <div className="flex items-center gap-1 p-1 bg-slate-100 dark:bg-slate-800 rounded-lg w-fit">
-        <button 
-          onClick={() => setActiveTab('modules')}
-          className={`px-4 py-2 text-sm font-medium rounded-md transition-all ${
-            activeTab === 'modules' 
-              ? 'bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200 shadow-sm' 
-              : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'
-          }`}
-        >
-          <div className="flex items-center gap-2">
-            <Package size={16} />
-            Modules ({modules.length})
-          </div>
-        </button>
-        <button 
-          onClick={() => setActiveTab('roles')}
-          className={`px-4 py-2 text-sm font-medium rounded-md transition-all ${
-            activeTab === 'roles' 
-              ? 'bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200 shadow-sm' 
-              : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'
-          }`}
-        >
-          <div className="flex items-center gap-2">
-            <Shield size={16} />
-            Vai trò ({mockRoles.length})
-          </div>
-        </button>
+      {/* Filters */}
+      <div className="flex flex-col sm:flex-row gap-3">
+        <div className="relative flex-1 max-w-md">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
+          <input 
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Tìm kiếm module..." 
+            className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg py-2 pl-9 pr-4 text-sm text-slate-700 dark:text-slate-200 placeholder:text-slate-400 dark:placeholder:text-slate-600 focus:border-cyan-500/50 outline-none"
+          />
+        </div>
+        
+        <div className="flex gap-2 flex-wrap">
+          {['all', ...Object.keys(categoryLabels)].map((cat) => (
+            <button 
+              key={cat}
+              onClick={() => setFilterCategory(cat)}
+              className={`px-3 py-1.5 text-xs font-medium rounded-lg border transition-all ${
+                filterCategory === cat 
+                  ? 'bg-cyan-500/10 border-cyan-500/30 text-cyan-600 dark:text-cyan-400' 
+                  : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'
+              }`}
+            >
+              {cat === 'all' ? 'Tất cả' : categoryLabels[cat].label}
+            </button>
+          ))}
+        </div>
       </div>
       
-      {activeTab === 'modules' && (
-        <>
-          {/* Filters */}
-          <div className="flex flex-col sm:flex-row gap-3">
-            <div className="relative flex-1 max-w-md">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
-              <input 
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Tìm kiếm module..." 
-                className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg py-2 pl-9 pr-4 text-sm text-slate-700 dark:text-slate-200 placeholder:text-slate-400 dark:placeholder:text-slate-600 focus:border-cyan-500/50 outline-none"
-              />
-            </div>
-            
-            <div className="flex gap-2 flex-wrap">
-              {['all', ...Object.keys(categoryLabels)].map((cat) => (
-                <button 
-                  key={cat}
-                  onClick={() => setFilterCategory(cat)}
-                  className={`px-3 py-1.5 text-xs font-medium rounded-lg border transition-all ${
-                    filterCategory === cat 
-                      ? 'bg-cyan-500/10 border-cyan-500/30 text-cyan-600 dark:text-cyan-400' 
-                      : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'
-                  }`}
-                >
-                  {cat === 'all' ? 'Tất cả' : categoryLabels[cat].label}
-                </button>
+      {/* Module Groups */}
+      <div className="space-y-6">
+        {Object.entries(groupedModules).map(([category, mods]) => (
+          <div key={category}>
+            <h3 className={`text-sm font-semibold mb-3 flex items-center gap-2 ${categoryLabels[category].color}`}>
+              {categoryLabels[category].label}
+              <span className="text-xs font-normal text-slate-500">({(mods as AdminModule[]).length})</span>
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {(mods as AdminModule[]).map(module => (
+                <ModuleCard 
+                  key={module.id} 
+                  module={module} 
+                  onToggle={handleToggleModule}
+                  canToggle={canToggleModule(module)}
+                  allModules={modules}
+                />
               ))}
             </div>
           </div>
-          
-          {/* Module Groups */}
-          <div className="space-y-6">
-            {Object.entries(groupedModules).map(([category, mods]) => (
-              <div key={category}>
-                <h3 className={`text-sm font-semibold mb-3 flex items-center gap-2 ${categoryLabels[category].color}`}>
-                  {categoryLabels[category].label}
-                  <span className="text-xs font-normal text-slate-500">({(mods as AdminModule[]).length})</span>
-                </h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {(mods as AdminModule[]).map(module => (
-                    <ModuleCard 
-                      key={module.id} 
-                      module={module} 
-                      onToggle={handleToggleModule}
-                      canToggle={canToggleModule(module)}
-                      allModules={modules}
-                    />
-                  ))}
-                </div>
-              </div>
-            ))}
-          </div>
-          
-          {filteredModules.length === 0 && (
-            <div className="text-center py-12 text-slate-500">
-              <Package size={48} className="mx-auto mb-3 opacity-50" />
-              <p>Không tìm thấy module nào</p>
-            </div>
-          )}
-        </>
-      )}
+        ))}
+      </div>
       
-      {activeTab === 'roles' && (
-        <div className="space-y-4">
-          {/* Super Admin Warning */}
-          <div className="bg-amber-500/10 border border-amber-500/20 rounded-lg p-4 flex items-start gap-3">
-            <AlertTriangle className="text-amber-500 shrink-0 mt-0.5" size={18} />
-            <div>
-              <h4 className="text-sm font-medium text-amber-600 dark:text-amber-400">Lưu ý về Super Admin</h4>
-              <p className="text-xs text-amber-600/80 dark:text-amber-400/80 mt-1">
-                Super Admin có toàn quyền truy cập hệ thống bao gồm cả System Console này. 
-                Chỉ cấp quyền Super Admin cho những người đáng tin cậy.
-              </p>
-            </div>
-          </div>
-          
-          {/* Add Role Button */}
-          <div className="flex justify-end">
-            <button className="flex items-center gap-2 px-4 py-2 bg-cyan-600 hover:bg-cyan-500 text-white text-sm font-medium rounded-lg transition-colors">
-              <Plus size={16} /> Thêm Vai trò mới
-            </button>
-          </div>
-          
-          {/* Role List */}
-          <div className="grid gap-4">
-            {mockRoles.map(role => (
-              <RoleCard key={role.id} role={role} onEdit={(r) => console.log('Edit role:', r)} />
-            ))}
-          </div>
+      {filteredModules.length === 0 && (
+        <div className="text-center py-12 text-slate-500">
+          <Package size={48} className="mx-auto mb-3 opacity-50" />
+          <p>Không tìm thấy module nào</p>
         </div>
       )}
     </div>
