@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ShoppingBag, Truck, MapPin } from 'lucide-react';
+import { ShoppingBag, Truck, MapPin, CreditCard, Wallet } from 'lucide-react';
 import { FieldConfig } from '../../types/moduleConfig';
 import { 
   ModuleHeader, ModuleStatus, ConventionNote, Code,
@@ -9,22 +9,28 @@ import {
 const INITIAL_FIELDS: FieldConfig[] = [
   { id: 'O1', name: 'Mã đơn hàng', key: 'order_number', type: 'text', required: true, enabled: true, isSystem: true },
   { id: 'O2', name: 'Khách hàng', key: 'customer_id', type: 'select', required: true, enabled: true, isSystem: true },
-  { id: 'O3', name: 'Tổng tiền', key: 'total', type: 'price', required: true, enabled: true, isSystem: true },
-  { id: 'O4', name: 'Trạng thái', key: 'status', type: 'select', required: true, enabled: true, isSystem: true },
-  { id: 'O5', name: 'Thứ tự', key: 'order', type: 'number', required: true, enabled: true, isSystem: true },
-  { id: 'O6', name: 'Active', key: 'active', type: 'boolean', required: true, enabled: true, isSystem: true },
-  { id: 'O7', name: 'Ghi chú', key: 'note', type: 'textarea', required: false, enabled: true, isSystem: false },
-  { id: 'O8', name: 'Mã vận đơn', key: 'tracking_number', type: 'text', required: false, enabled: true, isSystem: false, linkedFeature: 'enableTracking' },
-  { id: 'O9', name: 'Địa chỉ giao', key: 'shipping_address', type: 'textarea', required: false, enabled: true, isSystem: false, linkedFeature: 'enableShipping' },
+  { id: 'O3', name: 'Trạng thái đơn', key: 'status', type: 'select', required: true, enabled: true, isSystem: true },
+  { id: 'O4', name: 'Tổng tiền', key: 'total', type: 'price', required: true, enabled: true, isSystem: true },
+  { id: 'O5', name: 'Active', key: 'active', type: 'boolean', required: true, enabled: true, isSystem: true },
+  { id: 'O6', name: 'Ghi chú', key: 'note', type: 'textarea', required: false, enabled: true, isSystem: false },
+  // Payment fields
+  { id: 'O7', name: 'Phương thức TT', key: 'payment_method', type: 'select', required: false, enabled: true, isSystem: false, linkedFeature: 'enablePayment' },
+  { id: 'O8', name: 'Trạng thái TT', key: 'payment_status', type: 'select', required: false, enabled: true, isSystem: false, linkedFeature: 'enablePayment' },
+  // Shipping fields
+  { id: 'O9', name: 'Tạm tính', key: 'subtotal', type: 'price', required: false, enabled: true, isSystem: false, linkedFeature: 'enableShipping' },
+  { id: 'O10', name: 'Phí vận chuyển', key: 'shipping_fee', type: 'price', required: false, enabled: true, isSystem: false, linkedFeature: 'enableShipping' },
+  { id: 'O11', name: 'Địa chỉ giao', key: 'shipping_address', type: 'textarea', required: false, enabled: true, isSystem: false, linkedFeature: 'enableShipping' },
+  { id: 'O12', name: 'Mã vận đơn', key: 'tracking_number', type: 'text', required: false, enabled: true, isSystem: false, linkedFeature: 'enableTracking' },
 ];
 
 const FEATURES = [
-  { key: 'enableTracking', label: 'Theo dõi vận chuyển', icon: Truck, linkedField: 'tracking_number' },
-  { key: 'enableShipping', label: 'Địa chỉ giao hàng', icon: MapPin, linkedField: 'shipping_address' },
+  { key: 'enablePayment', label: 'Thanh toán', icon: CreditCard, description: 'Phương thức & trạng thái TT' },
+  { key: 'enableShipping', label: 'Vận chuyển', icon: Truck, description: 'Phí ship, địa chỉ giao' },
+  { key: 'enableTracking', label: 'Theo dõi vận đơn', icon: MapPin, linkedField: 'tracking_number' },
 ];
 
 export const OrdersModuleConfig: React.FC = () => {
-  const [features, setFeatures] = useState({ enableTracking: true, enableShipping: true });
+  const [features, setFeatures] = useState({ enablePayment: true, enableShipping: true, enableTracking: true });
   const [fields, setFields] = useState(INITIAL_FIELDS);
   const [settings, setSettings] = useState({ ordersPerPage: 20 });
 
@@ -90,7 +96,7 @@ export const OrdersModuleConfig: React.FC = () => {
       </div>
 
       <ConventionNote>
-        <strong>Convention:</strong> <Code>order_number</Code> tự sinh unique. Status: pending, processing, completed, cancelled.
+        <strong>Convention:</strong> <Code>order_number</Code> tự sinh unique. Status: pending, processing, shipped, completed, cancelled. Payment status: pending, paid, refunded. Payment method: cod, bank, momo, vnpay.
       </ConventionNote>
     </div>
   );

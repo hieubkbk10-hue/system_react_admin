@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Users, Image } from 'lucide-react';
+import { Users, Image, KeyRound, MapPin } from 'lucide-react';
 import { FieldConfig } from '../../types/moduleConfig';
 import { 
   ModuleHeader, ModuleStatus, ConventionNote, Code,
@@ -10,17 +10,23 @@ const INITIAL_FIELDS: FieldConfig[] = [
   { id: 'C1', name: 'Họ và tên', key: 'full_name', type: 'text', required: true, enabled: true, isSystem: true },
   { id: 'C2', name: 'Email', key: 'email', type: 'email', required: true, enabled: true, isSystem: true },
   { id: 'C3', name: 'Số điện thoại', key: 'phone', type: 'phone', required: true, enabled: true, isSystem: true },
-  { id: 'C4', name: 'Thứ tự', key: 'order', type: 'number', required: true, enabled: true, isSystem: true },
-  { id: 'C5', name: 'Trạng thái', key: 'active', type: 'boolean', required: true, enabled: true, isSystem: true },
-  { id: 'C6', name: 'Ảnh đại diện', key: 'avatar', type: 'image', required: false, enabled: false, isSystem: false, linkedFeature: 'enableAvatar' },
+  { id: 'C4', name: 'Trạng thái', key: 'active', type: 'boolean', required: true, enabled: true, isSystem: true },
+  // Customer login fields
+  { id: 'C5', name: 'Mật khẩu', key: 'password', type: 'password', required: false, enabled: false, isSystem: false, linkedFeature: 'enableLogin' },
+  // Address fields
+  { id: 'C6', name: 'Địa chỉ mặc định', key: 'default_address', type: 'textarea', required: false, enabled: false, isSystem: false, linkedFeature: 'enableAddresses' },
+  // Optional fields
+  { id: 'C7', name: 'Ảnh đại diện', key: 'avatar', type: 'image', required: false, enabled: false, isSystem: false, linkedFeature: 'enableAvatar' },
 ];
 
 const FEATURES = [
+  { key: 'enableLogin', label: 'Đăng nhập KH', icon: KeyRound, description: 'Cho phép KH tạo tài khoản' },
+  { key: 'enableAddresses', label: 'Sổ địa chỉ', icon: MapPin, description: 'Lưu địa chỉ giao hàng' },
   { key: 'enableAvatar', label: 'Ảnh đại diện', icon: Image, linkedField: 'avatar' },
 ];
 
 export const CustomersModuleConfig: React.FC = () => {
-  const [features, setFeatures] = useState({ enableAvatar: false });
+  const [features, setFeatures] = useState({ enableLogin: false, enableAddresses: false, enableAvatar: false });
   const [fields, setFields] = useState(INITIAL_FIELDS);
   const [settings, setSettings] = useState({ customersPerPage: 20 });
 
@@ -86,7 +92,7 @@ export const CustomersModuleConfig: React.FC = () => {
       </div>
 
       <ConventionNote>
-        <strong>Convention:</strong> Email unique và lowercase. Trường <Code>order</Code> và <Code>active</Code> bắt buộc theo Rails convention.
+        <strong>Convention:</strong> Email unique và lowercase. Mật khẩu hash bằng bcrypt. Địa chỉ có thể mở rộng thành model riêng (CustomerAddress) nếu cần nhiều địa chỉ.
       </ConventionNote>
     </div>
   );
