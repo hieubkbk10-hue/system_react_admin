@@ -40,38 +40,38 @@ interface PresetConfig {
 const PRESET_CONFIGS: PresetConfig[] = [
   {
     id: 'blog',
-    name: 'Blog / Tin tuc',
-    description: 'Website blog, tin tuc voi bai viet va binh luan',
+    name: 'Blog / News',
+    description: 'Blog with posts and comments',
     modules: ['MOD-POSTS', 'MOD-COMMENTS', 'MOD-MEDIA', 'MOD-CUSTOMERS', 'MOD-USERS', 'MOD-ROLES', 'MOD-SETTINGS', 'MOD-MENUS', 'MOD-HOMEPAGE', 'MOD-ANALYTICS']
   },
   {
     id: 'landing',
     name: 'Landing Page',
-    description: 'Trang gioi thieu, portfolio don gian',
+    description: 'Simple portfolio or landing page',
     modules: ['MOD-POSTS', 'MOD-MEDIA', 'MOD-USERS', 'MOD-ROLES', 'MOD-SETTINGS', 'MOD-MENUS', 'MOD-HOMEPAGE']
   },
   {
     id: 'catalog',
-    name: 'Catalog / Showcase',
-    description: 'Trung bay san pham, lien he dat hang',
+    name: 'Catalog',
+    description: 'Product showcase without cart',
     modules: ['MOD-PRODUCTS', 'MOD-MEDIA', 'MOD-CUSTOMERS', 'MOD-USERS', 'MOD-ROLES', 'MOD-SETTINGS', 'MOD-MENUS', 'MOD-HOMEPAGE', 'MOD-NOTIFICATIONS', 'MOD-ANALYTICS']
   },
   {
     id: 'ecommerce-basic',
     name: 'eCommerce Basic',
-    description: 'Shop don gian voi gio hang',
+    description: 'Simple shop with cart',
     modules: ['MOD-PRODUCTS', 'MOD-ORDERS', 'MOD-CART', 'MOD-MEDIA', 'MOD-CUSTOMERS', 'MOD-USERS', 'MOD-ROLES', 'MOD-SETTINGS', 'MOD-MENUS', 'MOD-HOMEPAGE', 'MOD-NOTIFICATIONS', 'MOD-ANALYTICS']
   },
   {
     id: 'ecommerce-full',
     name: 'eCommerce Full',
-    description: 'Shop day du: gio hang, wishlist, khuyen mai',
+    description: 'Full shop: cart, wishlist, promotions',
     modules: ['MOD-POSTS', 'MOD-COMMENTS', 'MOD-MEDIA', 'MOD-PRODUCTS', 'MOD-ORDERS', 'MOD-CART', 'MOD-WISHLIST', 'MOD-CUSTOMERS', 'MOD-USERS', 'MOD-ROLES', 'MOD-SETTINGS', 'MOD-MENUS', 'MOD-HOMEPAGE', 'MOD-NOTIFICATIONS', 'MOD-PROMOTIONS', 'MOD-ANALYTICS']
   },
   {
     id: 'custom',
     name: 'Custom',
-    description: 'Cau hinh thu cong',
+    description: 'Manual configuration',
     modules: []
   }
 ];
