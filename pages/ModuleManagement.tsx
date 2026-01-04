@@ -24,8 +24,7 @@ import {
   ChevronDown,
   FileCode,
   Download,
-  ExternalLink,
-  Sparkles
+  ExternalLink
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { AdminModule, PermissionAction } from '../types';
@@ -35,52 +34,45 @@ interface PresetConfig {
   id: string;
   name: string;
   description: string;
-  icon: string;
   modules: string[]; // Module IDs to enable
 }
 
 const PRESET_CONFIGS: PresetConfig[] = [
   {
     id: 'blog',
-    name: 'Blog / Tin tức',
-    description: 'Website blog, tin tức với bài viết và bình luận',
-    icon: '📝',
+    name: 'Blog / Tin tuc',
+    description: 'Website blog, tin tuc voi bai viet va binh luan',
     modules: ['MOD-POSTS', 'MOD-COMMENTS', 'MOD-MEDIA', 'MOD-CUSTOMERS', 'MOD-USERS', 'MOD-ROLES', 'MOD-SETTINGS', 'MOD-MENUS', 'MOD-HOMEPAGE', 'MOD-ANALYTICS']
   },
   {
     id: 'landing',
     name: 'Landing Page',
-    description: 'Trang giới thiệu, portfolio, liên hệ đơn giản',
-    icon: '🚀',
+    description: 'Trang gioi thieu, portfolio don gian',
     modules: ['MOD-POSTS', 'MOD-MEDIA', 'MOD-USERS', 'MOD-ROLES', 'MOD-SETTINGS', 'MOD-MENUS', 'MOD-HOMEPAGE']
   },
   {
     id: 'catalog',
     name: 'Catalog / Showcase',
-    description: 'Trưng bày sản phẩm, không cần giỏ hàng (liên hệ đặt hàng)',
-    icon: '📦',
+    description: 'Trung bay san pham, lien he dat hang',
     modules: ['MOD-PRODUCTS', 'MOD-MEDIA', 'MOD-CUSTOMERS', 'MOD-USERS', 'MOD-ROLES', 'MOD-SETTINGS', 'MOD-MENUS', 'MOD-HOMEPAGE', 'MOD-NOTIFICATIONS', 'MOD-ANALYTICS']
   },
   {
     id: 'ecommerce-basic',
     name: 'eCommerce Basic',
-    description: 'Shop đơn giản với giỏ hàng, không khuyến mãi',
-    icon: '🛒',
+    description: 'Shop don gian voi gio hang',
     modules: ['MOD-PRODUCTS', 'MOD-ORDERS', 'MOD-CART', 'MOD-MEDIA', 'MOD-CUSTOMERS', 'MOD-USERS', 'MOD-ROLES', 'MOD-SETTINGS', 'MOD-MENUS', 'MOD-HOMEPAGE', 'MOD-NOTIFICATIONS', 'MOD-ANALYTICS']
   },
   {
     id: 'ecommerce-full',
     name: 'eCommerce Full',
-    description: 'Shop đầy đủ: giỏ hàng, wishlist, khuyến mãi, thống kê',
-    icon: '🏪',
+    description: 'Shop day du: gio hang, wishlist, khuyen mai',
     modules: ['MOD-POSTS', 'MOD-COMMENTS', 'MOD-MEDIA', 'MOD-PRODUCTS', 'MOD-ORDERS', 'MOD-CART', 'MOD-WISHLIST', 'MOD-CUSTOMERS', 'MOD-USERS', 'MOD-ROLES', 'MOD-SETTINGS', 'MOD-MENUS', 'MOD-HOMEPAGE', 'MOD-NOTIFICATIONS', 'MOD-PROMOTIONS', 'MOD-ANALYTICS']
   },
   {
     id: 'custom',
-    name: 'Tùy chỉnh',
-    description: 'Cấu hình thủ công theo nhu cầu riêng',
-    icon: '⚙️',
-    modules: [] // Will not change modules
+    name: 'Custom',
+    description: 'Cau hinh thu cong',
+    modules: []
   }
 ];
 
@@ -160,40 +152,46 @@ const moduleConfigRoutes: Record<string, string> = {
   'MOD-ANALYTICS': '/modules/analytics',
 };
 
-// Helper: Generate Markdown config
+// Category labels for markdown (no Vietnamese diacritics)
+const categoryLabelsEn: Record<string, string> = {
+  content: 'Content',
+  commerce: 'Commerce',
+  user: 'User',
+  system: 'System',
+  marketing: 'Marketing',
+};
+
+// Helper: Generate Markdown config (ASCII only for compatibility)
 const generateConfigMarkdown = (modules: AdminModule[], presetId?: string): string => {
   const enabledModules = modules.filter(m => m.enabled);
   const disabledModules = modules.filter(m => !m.enabled);
   const preset = PRESET_CONFIGS.find(p => p.id === presetId);
   
-  const now = new Date().toLocaleDateString('vi-VN', { 
-    year: 'numeric', month: '2-digit', day: '2-digit', 
-    hour: '2-digit', minute: '2-digit' 
-  });
+  const now = new Date().toISOString().slice(0, 16).replace('T', ' ');
 
   return `# Admin Module Configuration
 
 > Generated: ${now}
-> Preset: ${preset?.name || 'Tùy chỉnh'}
+> Preset: ${preset?.name || 'Custom'}
 
-## Tổng quan
+## Summary
 
-- **Modules bật:** ${enabledModules.length}
-- **Modules tắt:** ${disabledModules.length}
+- Enabled: ${enabledModules.length}
+- Disabled: ${disabledModules.length}
 
-## Modules được bật
+## Enabled Modules
 
 | Module | Category | Core | Permissions |
 |--------|----------|------|-------------|
 ${enabledModules.map(m => 
-  `| ${m.name} | ${categoryLabels[m.category].label} | ${m.isCore ? '✅' : '❌'} | ${m.permissions.join(', ')} |`
+  `| ${m.key} | ${categoryLabelsEn[m.category]} | ${m.isCore ? 'Yes' : 'No'} | ${m.permissions.join(', ')} |`
 ).join('\n')}
 
-## Modules bị tắt
+## Disabled Modules
 
 ${disabledModules.length > 0 
-  ? disabledModules.map(m => `- ~~${m.name}~~ (${categoryLabels[m.category].label})`).join('\n')
-  : '_Không có module nào bị tắt_'}
+  ? disabledModules.map(m => `- ${m.key} (${categoryLabelsEn[m.category]})`).join('\n')
+  : '_None_'}
 
 ## JSON Config
 
@@ -205,9 +203,6 @@ ${modules.map(m => `    "${m.key}": ${m.enabled}`).join(',\n')}
   }
 }
 \`\`\`
-
----
-*Config này có thể import vào dự án mới hoặc share cho team.*
 `;
 };
 
@@ -223,46 +218,40 @@ const PresetDropdown: React.FC<{
     <div className="relative">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2 px-3 py-2 bg-gradient-to-r from-cyan-600 to-cyan-500 hover:from-cyan-500 hover:to-cyan-400 text-white text-sm font-medium rounded-lg transition-all shadow-sm"
+        className="flex items-center gap-2 px-3 py-2 bg-cyan-600 hover:bg-cyan-500 text-white text-sm font-medium rounded-lg transition-colors"
       >
-        <Sparkles size={16} />
-        <span>{selected.icon} {selected.name}</span>
+        <span>{selected.name}</span>
         <ChevronDown size={14} className={`transition-transform ${isOpen ? 'rotate-180' : ''}`} />
       </button>
       
       {isOpen && (
         <>
           <div className="fixed inset-0 z-10" onClick={() => setIsOpen(false)} />
-          <div className="absolute top-full left-0 mt-1 w-72 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg shadow-xl z-20 overflow-hidden">
+          <div className="absolute top-full left-0 mt-1 w-64 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg shadow-lg z-20 overflow-hidden">
             <div className="p-2 border-b border-slate-100 dark:border-slate-800">
-              <p className="text-[10px] text-slate-500 uppercase font-semibold px-2">Chọn cấu hình mẫu</p>
+              <p className="text-[10px] text-slate-500 uppercase font-semibold px-2">Select preset</p>
             </div>
-            <div className="max-h-80 overflow-y-auto">
+            <div className="max-h-72 overflow-y-auto">
               {PRESET_CONFIGS.map(preset => (
                 <button
                   key={preset.id}
                   onClick={() => { onSelect(preset.id); setIsOpen(false); }}
-                  className={`w-full px-3 py-2.5 text-left hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors ${
-                    selectedPreset === preset.id ? 'bg-cyan-50 dark:bg-cyan-900/20' : ''
+                  className={`w-full px-3 py-2 text-left hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors ${
+                    selectedPreset === preset.id ? 'bg-slate-50 dark:bg-slate-800' : ''
                   }`}
                 >
-                  <div className="flex items-start gap-2">
-                    <span className="text-lg">{preset.icon}</span>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2">
-                        <span className="text-sm font-medium text-slate-800 dark:text-slate-200">{preset.name}</span>
-                        {selectedPreset === preset.id && (
-                          <Check size={14} className="text-cyan-500" />
-                        )}
-                      </div>
-                      <p className="text-xs text-slate-500 mt-0.5">{preset.description}</p>
-                      {preset.id !== 'custom' && (
-                        <p className="text-[10px] text-cyan-600 dark:text-cyan-400 mt-1">
-                          {preset.modules.length} modules
-                        </p>
-                      )}
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <span className="text-sm font-medium text-slate-800 dark:text-slate-200">{preset.name}</span>
+                      <p className="text-xs text-slate-500">{preset.description}</p>
                     </div>
+                    {selectedPreset === preset.id && (
+                      <Check size={14} className="text-cyan-500 shrink-0" />
+                    )}
                   </div>
+                  {preset.id !== 'custom' && (
+                    <p className="text-[10px] text-slate-400 mt-1">{preset.modules.length} modules</p>
+                  )}
                 </button>
               ))}
             </div>
